@@ -1,17 +1,25 @@
 pragma solidity ^0.4.24;
 
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 // This is Safe Box for RootsProject.co
 
 contract RootsSafeBox is Ownable {
+	using SafeMath for uint256;
 
 	// address who receive all assets from this smart contract
 	address public destinationAddress;
 
+	// address for default token smart contract
+	address public defaultTokenAddress;
+
 	// timestamp until assets is frozen at this smart contract
 	uint256 public safeTime;
+
+	// how much ERC223 tokens store at this SafeBox (at this smart contract)
+	mapping (address => uint256) public balances;
 
 	/**
 	* @dev Reverts if a safe box is still locked.
@@ -22,11 +30,13 @@ contract RootsSafeBox is Ownable {
 	}
 
 	// constructor
-	function RootsSafeBox(address _destinationAddress, uint256 _safeTime) public {
+	function RootsSafeBox(address _destinationAddress, address _defaultTokenAddress, uint256 _safeTime) public {
 		require(_destinationAddress != 0x0);
+		require(_defaultTokenAddress != 0x0);
 		require(_safeTime > now);
 
 		destinationAddress = _destinationAddress;
+		defaultTokenAddress = _defaultTokenAddress;
 		safeTime = _safeTime;
 	}
 
@@ -34,6 +44,13 @@ contract RootsSafeBox is Ownable {
 		require(_safeTime > now);
 		safeTime = _safeTime;
 		return true;
+	}
+
+	/**
+    * Claim withdraw default tokens.
+    */
+	function withdrawToken() onlyAfterSafeTime public {
+		return this.baseWithdrawToken(defaultTokenAddress);
 	}
 
 	/**
@@ -56,8 +73,12 @@ contract RootsSafeBox is Ownable {
     * Base function for withdraw tokens.
     */
 	function baseWithdrawToken(address _tokenAddress) internal {
-		require(ERC20(_tokenAddress).balanceOf(address(this)) > 0);
-		ERC20(_tokenAddress).transfer(destinationAddress, ERC20(_tokenAddress).balanceOf(address(this)));
+		uint256 balance = ERC20(_tokenAddress).balanceOf(address(this));
+		require(balance > 0);
+
+		ERC20(_tokenAddress).transfer(destinationAddress, balance);
+
+		balances[_tokenAddress] = 0;
 	}
 
 	/**
@@ -68,6 +89,7 @@ contract RootsSafeBox is Ownable {
 	* @param _data  Transaction metadata.
 	*/
 	function tokenFallback(address _from, uint _value, bytes _data) external returns (bool) {
+		balances[msg.sender] = balances[msg.sender].add(_value);
 		return true;
 	}
 }
