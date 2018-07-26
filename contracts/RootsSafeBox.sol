@@ -50,7 +50,7 @@ contract RootsSafeBox is Ownable {
     * Claim withdraw default tokens.
     */
 	function withdrawToken() onlyAfterSafeTime public {
-		return this.baseWithdrawToken(defaultTokenAddress);
+		return baseWithdrawToken(defaultTokenAddress);
 	}
 
 	/**
@@ -58,7 +58,7 @@ contract RootsSafeBox is Ownable {
     */
 	function withdrawToken(address _tokenAddress) onlyAfterSafeTime public {
 		require(_tokenAddress != 0x0);
-		return this.baseWithdrawToken(_tokenAddress);
+		return baseWithdrawToken(_tokenAddress);
 	}
 
 	/**
