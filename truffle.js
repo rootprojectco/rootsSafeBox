@@ -1,5 +1,6 @@
 const HDWalletProvider = require("truffle-hdwallet-provider-privkey");
 
+const configs = require('./configs/config');
 const privKey = process.env.privateKey; // private key
 
 module.exports = {
@@ -13,7 +14,7 @@ module.exports = {
 			network_id: "*" // Match any network id
 		},
 		rinkeby: {
-			provider: new HDWalletProvider(privKey, 'https://rinkeby.infura.io/v3/8995b01133a04236bf97b129a1c9f019'),
+			provider: new HDWalletProvider(configs.privateKey, configs.providers.rinkeby.host),
 			network_id: '*',
 			gas: 4500000,
 			gasPrice: 25000000000
