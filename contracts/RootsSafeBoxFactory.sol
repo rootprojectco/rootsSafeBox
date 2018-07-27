@@ -44,10 +44,10 @@ contract RootsSafeBoxFactory is Ownable {
     function create(address _destinationAddress, uint256 _safeTime) public returns (RootsSafeBox) {
         RootsSafeBox newContract = new RootsSafeBox(_destinationAddress, tokenAddress, _safeTime, msg.sender);
 
-        boxes[_address].addr = address(newContract);
-        boxes[_address].owner = msg.sender;
-        boxes[_address].destination = _destinationAddress;
-        boxes[_address].index = boxesAddr.push(address(newContract)) - 1;
+        boxes[newContract].addr = newContract;
+        boxes[newContract].owner = msg.sender;
+        boxes[newContract].destination = _destinationAddress;
+        boxes[newContract].index = boxesAddr.push(newContract) - 1;
 
         return newContract;
     }
