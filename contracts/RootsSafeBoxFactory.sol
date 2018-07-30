@@ -37,7 +37,7 @@ contract RootsSafeBoxFactory is Ownable {
 
     // ---====== CONSTRUCTOR ======---
 
-    function RootsSafeBoxFactory(address _rootsToken) public {
+    constructor(address _rootsToken) public {
         require(_rootsToken != 0x0);
         tokenAddress = _rootsToken;
     }

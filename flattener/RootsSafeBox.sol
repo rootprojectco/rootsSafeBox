@@ -175,8 +175,14 @@ contract RootsSafeBox is Ownable {
         _;
     }
 
-    // constructor
-    function RootsSafeBox(address _destinationAddress, address _defaultTokenAddress, uint256 _safeTime, address _owner) public {
+    /**
+    * @dev RootsSafeBox constructor
+    * @param _destinationAddress recipient account address.
+    * @param _defaultTokenAddress defaul token address for withdraw
+    * @param _safeTime The amount of time in unix timestamp until safe box is closed.
+    * @param _owner Owner account address.
+    */
+    constructor(address _destinationAddress, address _defaultTokenAddress, uint256 _safeTime, address _owner) public {
         require(_destinationAddress != 0x0);
         require(_defaultTokenAddress != 0x0);
         require(_owner != 0x0);

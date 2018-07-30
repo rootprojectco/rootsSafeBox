@@ -175,8 +175,14 @@ contract RootsSafeBox is Ownable {
         _;
     }
 
-    // constructor
-    function RootsSafeBox(address _destinationAddress, address _defaultTokenAddress, uint256 _safeTime, address _owner) public {
+    /**
+    * @dev RootsSafeBox constructor
+    * @param _destinationAddress recipient account address.
+    * @param _defaultTokenAddress defaul token address for withdraw
+    * @param _safeTime The amount of time in unix timestamp until safe box is closed.
+    * @param _owner Owner account address.
+    */
+    constructor(address _destinationAddress, address _defaultTokenAddress, uint256 _safeTime, address _owner) public {
         require(_destinationAddress != 0x0);
         require(_defaultTokenAddress != 0x0);
         require(_owner != 0x0);
@@ -277,17 +283,23 @@ contract RootsSafeBoxFactory is Ownable {
 
     // ---====== CONSTRUCTOR ======---
 
-    function RootsSafeBoxFactory(address _rootsToken) public {
+    constructor(address _rootsToken) public {
+        require(_rootsToken != 0x0);
+        tokenAddress = _rootsToken;
+    }
+
+    function changeTokenAddress(address _rootsToken) onlyOwner public {
+        require(_rootsToken != 0x0);
         tokenAddress = _rootsToken;
     }
 
     function create(address _destinationAddress, uint256 _safeTime) public returns (RootsSafeBox) {
         RootsSafeBox newContract = new RootsSafeBox(_destinationAddress, tokenAddress, _safeTime, msg.sender);
 
-        boxes[_address].addr = address(newContract);
-        boxes[_address].owner = msg.sender;
-        boxes[_address].destination = _destinationAddress;
-        boxes[_address].index = boxesAddr.push(address(newContract)) - 1;
+        boxes[newContract].addr = newContract;
+        boxes[newContract].owner = msg.sender;
+        boxes[newContract].destination = _destinationAddress;
+        boxes[newContract].index = boxesAddr.push(newContract) - 1;
 
         return newContract;
     }
